@@ -1,7 +1,7 @@
 # pyroscope-kafka-sandbox
 
 ## Overview
-Instrumenting a typical Kafka environment using Pyroscope
+Profiling a typical Kafka environment using Pyroscope
 
 ## Environment
 
