@@ -10,6 +10,11 @@ services:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
+      PYROSCOPE_APPLICATION_NAME: "zookeeper"
+      PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
+      EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
+    volumes:
+      - ./pyroscope-agent/:/pyroscope-agent
     healthcheck:
       interval: 10s
       retries: 25
