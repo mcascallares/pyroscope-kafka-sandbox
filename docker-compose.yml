@@ -1,0 +1,150 @@
+---
+version: '3.9'
+services:
+  zookeeper:
+    hostname: zookeeper
+    image: confluentinc/cp-zookeeper:${TAG}
+    ports:
+      - '32181:32181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
+    healthcheck:
+      interval: 10s
+      retries: 25
+      test: echo srvr | nc zookeeper 32181 || exit 1
+      
+  kafka-1:
+    hostname: kafka-1
+    image: confluentinc/cp-kafka:${TAG}
+    ports:
+      - '10092:10092'
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      # INTERNAL for interbroker, IN_DOCKER for clients inside Docker, OUT_DOCKER for access from Mac
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, IN_DOCKER:PLAINTEXT, OUT_DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:29092, IN_DOCKER://kafka-1:9092, OUT_DOCKER://localhost:10092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.request.logger=INFO"
+      PYROSCOPE_APPLICATION_NAME: "kafka-1"
+      PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
+      EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
+    volumes:
+      - ./pyroscope-agent/:/pyroscope-agent
+    healthcheck:
+      test: kafka-broker-api-versions --bootstrap-server localhost:9092
+      interval: 10s
+      retries: 25
+      start_period: 20s
+
+  kafka-2:
+    hostname: kafka-2
+    image: confluentinc/cp-kafka:${TAG}
+    ports:
+      - '10093:10093'
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, IN_DOCKER:PLAINTEXT, OUT_DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:29092, IN_DOCKER://kafka-2:9092, OUT_DOCKER://localhost:10093
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.request.logger=INFO"
+      PYROSCOPE_APPLICATION_NAME: "kafka-2"
+      PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
+      EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
+    volumes:
+      - ./pyroscope-agent/:/pyroscope-agent
+    healthcheck:
+      test: kafka-broker-api-versions --bootstrap-server localhost:9092
+      interval: 10s
+      retries: 25
+      start_period: 20s
+
+  schema-registry:
+    hostname: schema-registry
+    image: confluentinc/cp-schema-registry:${TAG}
+    ports:
+      - 8081:8081
+    depends_on:
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092
+      PYROSCOPE_APPLICATION_NAME: "schema-registry"
+      PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
+      EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
+    volumes:
+      - ./pyroscope-agent/:/pyroscope-agent
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: curl http://localhost:8081/ --output /dev/null || exit 1
+  
+  connect-1:
+    hostname: connect-1
+    image: confluentinc/cp-kafka-connect:${TAG}
+    ports:
+      - 8083:8083
+    depends_on:
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    environment:
+      CONNECT_LISTENERS: http://0.0.0.0:8083
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect-1
+      CONNECT_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092
+      CONNECT_GROUP_ID: connect
+      CONNECT_CONFIG_STORAGE_TOPIC: _connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: _connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: _connect-status
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_HEADER_CONVERTER: org.apache.kafka.connect.storage.SimpleHeaderConverter
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
+      PYROSCOPE_APPLICATION_NAME: "connect-1"
+      PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
+      EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
+    volumes:
+      - ./pyroscope-agent/:/pyroscope-agent
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: curl http://localhost:8083/ --output /dev/null || exit 1
+  
+  pyroscope:
+    hostname: pyroscope
+    image: 'pyroscope/pyroscope:latest'
+    environment:
+      - 'PYROSCOPE_LOG_LEVEL=debug'
+    ports:
+      - '4040:4040'
+    command:
+      - 'server'
+      - '-no-self-profiling'
