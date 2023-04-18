@@ -16,3 +16,5 @@ docker-compose up -d
 ## Browser Pyroscope UI
 
 Hit http://localhost:4040 from your browser
+
+![PyroscopeUI](https://github.com/mcascallares/pyroscope-kafka-sandbox/raw/main/screenshots/pyroscope-ui.png)
