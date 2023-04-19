@@ -13,7 +13,7 @@ The environment has 1 Zokeeper, 2 Kafka Brokers, 1 Connect and 1 Schema Registry
 docker-compose up -d
 ```
 
-## Browser Pyroscope UI
+## Access the Pyroscope UI
 
 Hit http://localhost:4040 from your browser
 
