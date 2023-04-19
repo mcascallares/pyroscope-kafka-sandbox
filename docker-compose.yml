@@ -40,8 +40,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.request.logger=INFO"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WAR
       PYROSCOPE_APPLICATION_NAME: "kafka-1"
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
@@ -73,7 +72,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.request.logger=INFO"
       PYROSCOPE_APPLICATION_NAME: "kafka-2"
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
