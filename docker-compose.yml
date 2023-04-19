@@ -3,7 +3,7 @@ version: '3.9'
 services:
   zookeeper:
     hostname: zookeeper
-    image: confluentinc/cp-zookeeper:${TAG}
+    image: confluentinc/cp-zookeeper:${KAFKA_VERSION}
     ports:
       - '32181:32181'
     environment:
@@ -22,7 +22,7 @@ services:
       
   kafka-1:
     hostname: kafka-1
-    image: confluentinc/cp-kafka:${TAG}
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
     ports:
       - '10092:10092'
     depends_on:
@@ -55,7 +55,7 @@ services:
 
   kafka-2:
     hostname: kafka-2
-    image: confluentinc/cp-kafka:${TAG}
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
     ports:
       - '10093:10093'
     depends_on:
@@ -87,7 +87,7 @@ services:
 
   schema-registry:
     hostname: schema-registry
-    image: confluentinc/cp-schema-registry:${TAG}
+    image: confluentinc/cp-schema-registry:${KAFKA_VERSION}
     ports:
       - 8081:8081
     depends_on:
@@ -110,7 +110,7 @@ services:
   
   connect-1:
     hostname: connect-1
-    image: confluentinc/cp-kafka-connect:${TAG}
+    image: confluentinc/cp-kafka-connect:${KAFKA_VERSION}
     ports:
       - 8083:8083
     depends_on:
@@ -145,11 +145,9 @@ services:
   
   pyroscope:
     hostname: pyroscope
-    image: 'pyroscope/pyroscope:latest'
-    environment:
-      - 'PYROSCOPE_LOG_LEVEL=debug'
+    image: pyroscope/pyroscope:${PYROSCOPE_VERSION}
     ports:
       - '4040:4040'
     command:
-      - 'server'
-      - '-no-self-profiling'
+      - "server"
+      - "-no-self-profiling"
