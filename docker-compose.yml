@@ -106,8 +106,8 @@ services:
       retries: 20
       test: curl http://localhost:8081/ --output /dev/null || exit 1
   
-  connect-1:
-    hostname: connect-1
+  connect:
+    hostname: connect
     image: confluentinc/cp-kafka-connect:${KAFKA_VERSION}
     ports:
       - 8083:8083
@@ -118,7 +118,7 @@ services:
         condition: service_healthy
     environment:
       CONNECT_LISTENERS: http://0.0.0.0:8083
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect-1
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
       CONNECT_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092
       CONNECT_GROUP_ID: connect
       CONNECT_CONFIG_STORAGE_TOPIC: _connect-configs
@@ -131,7 +131,7 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
-      PYROSCOPE_APPLICATION_NAME: "connect-1"
+      PYROSCOPE_APPLICATION_NAME: "connect"
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
