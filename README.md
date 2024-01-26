@@ -10,7 +10,7 @@ Profiling a typical Kafka environment using Pyroscope
 The environment has 1 Zookeeper, 2 Kafka Brokers, 1 Connect, and 1 Schema Registry. All the mentioned components are instrumented with the pyroscope agent that you can find in the `pyroscope-agent` folder.
 
 
-## Executing
+## Launching
 
 ```
 docker compose up -d
