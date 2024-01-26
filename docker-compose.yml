@@ -14,7 +14,7 @@ services:
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
-      - ./pyroscope-agent/pyroscope-0.11.2.jar:/pyroscope-agent/pyroscope.jar
+      - ./pyroscope-agent/pyroscope-0.12.2.jar:/pyroscope-agent/pyroscope.jar
     healthcheck:
       interval: 10s
       retries: 25
@@ -45,7 +45,7 @@ services:
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
-      - ./pyroscope-agent/pyroscope-0.11.2.jar:/pyroscope-agent/pyroscope.jar
+      - ./pyroscope-agent/pyroscope-0.12.2.jar:/pyroscope-agent/pyroscope.jar
     healthcheck:
       test: kafka-broker-api-versions --bootstrap-server localhost:9092
       interval: 10s
@@ -76,7 +76,7 @@ services:
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
-      - ./pyroscope-agent/pyroscope-0.11.2.jar:/pyroscope-agent/pyroscope.jar
+      - ./pyroscope-agent/pyroscope-0.12.2.jar:/pyroscope-agent/pyroscope.jar
     healthcheck:
       test: kafka-broker-api-versions --bootstrap-server localhost:9092
       interval: 10s
@@ -101,7 +101,7 @@ services:
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
-      - ./pyroscope-agent/pyroscope-0.11.2.jar:/pyroscope-agent/pyroscope.jar
+      - ./pyroscope-agent/pyroscope-0.12.2.jar:/pyroscope-agent/pyroscope.jar
     healthcheck:
       interval: 10s
       retries: 20
@@ -137,7 +137,7 @@ services:
       PYROSCOPE_SERVER_ADDRESS: "http://pyroscope:4040"
       EXTRA_ARGS: "-javaagent:/pyroscope-agent/pyroscope.jar"
     volumes:
-      - ./pyroscope-agent/pyroscope-0.11.2.jar:/pyroscope-agent/pyroscope.jar
+      - ./pyroscope-agent/pyroscope-0.12.2.jar:/pyroscope-agent/pyroscope.jar
     healthcheck:
       interval: 10s
       retries: 20
@@ -145,7 +145,7 @@ services:
   
   pyroscope:
     hostname: pyroscope
-    image: pyroscope/pyroscope:${PYROSCOPE_VERSION}
+    image: grafana/pyroscope:${PYROSCOPE_VERSION}
     ports:
       - '4040:4040'
     command:
